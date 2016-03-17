@@ -1,14 +1,15 @@
-import urllib.request
+import urllib2
 import json
 import sys
 import ctypes
 import time
+from subprocess import call
 
 # Get the URL for the top posts of the last 24 hours for a subreddit
 getSubredditURL = lambda subreddit: "https://www.reddit.com/r/" + subreddit + "/search.json?q=url%3A.jpg+OR+url%3A.png&sort=top&restrict_sr=on&t=day"
 
 # get the top posts of the last 24 hours in JSON format
-getText = lambda url: urllib.request.urlopen(url).read()
+getText = lambda url: urllib2.urlopen(url).read()
 
 # get the text as JSON
 getJSONFromText = lambda text: json.loads(text.decode('utf-8'))
@@ -19,16 +20,17 @@ getChildrenFromJSON = lambda json: json["data"]["children"]
 # get the data for an individual post ("child")
 getDataOfChild = lambda children, index: children[index]["data"]
 
-# from the URL of a post, cut out the address and addtional parameters and get only the name and 
+# from the URL of a post, cut out the address and addtional parameters and get only the name and
 # extension of the image
 #  eg. from "http://i.imgur.com/abcd.jpg?1" get "abcd.jpg"
 getImageNameFromURL = lambda url: url.split("/")[-1].split("?")[0]
 
 # store the image from the URL specified to the directory and filename specified
-storeImage = lambda url, fileName: open(fileName, "wb").write(urllib.request.urlopen(url).read())
+storeImage = lambda url, fileName: open(fileName, "wb").write(urllib2.urlopen(url).read())
 
 # set the image specified as the desktop background
-setImageAsBackground = lambda image: ctypes.windll.user32.SystemParametersInfoW(20, 0, image , 0)
+#setImageAsBackground = lambda image: ctypes.windll.user32.SystemParametersInfoW(20, 0, image , 0) #Windows
+setImageAsBackground = lambda image: call(['gsettings', 'set', 'org.gnome.desktop.background', 'picture-uri', '"file:///'+image+'"']) #Linux/Gnome
 
 # all together now:
 def setBackground():
@@ -46,7 +48,7 @@ def setBackground():
 		try:
 			text = getText(url)
 			break
-		except urllib.error.HTTPError as err:
+		except urllib2.HTTPError as err:
 			time.sleep(5)
 
 	json = getJSONFromText(text)
@@ -54,7 +56,7 @@ def setBackground():
 	firstChild = getDataOfChild(children, 0)
 	imageName = getImageNameFromURL(firstChild["url"])
 
-	fullImageName = "C:\\redditbackground\\" + imageName
+	fullImageName = "/home/rchughes/Pictures/redditbackground/" + imageName
 	storeImage(firstChild["url"], fullImageName)
 	setImageAsBackground(fullImageName)
 
