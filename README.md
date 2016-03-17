@@ -6,11 +6,11 @@ Download the latest version of Python from <a href="https://www.python.org/">pyt
 
 <h2>2. Add the script file on your computer</h2>
 
-Create a folder on your C: drive and call it <b>RedditBackground</b>. Add the file RedditBackground.py in that folder.
+Create a folder on your Pictures folder and call it <b>redditbackground</b>. Add the file RedditBackground.py in that folder.
 
 <h2>Run the script</h2>
 
-To run the RedditBackground script, open the command line and point to C:\RedditBackground. Now run this command:
+To run the RedditBackground script, open the command line run this command:
 
 <code>python RedditBackground.py subredditName</code>
 
